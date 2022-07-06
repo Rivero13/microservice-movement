@@ -22,8 +22,4 @@ public class Movement {
     private double amount;
     private String idBankAccount;
 
-    public Movement(Date date, double commission) {
-        this.date = date;
-        this.commission = commission;
-    }
 }
