@@ -23,7 +23,7 @@ public class MovementServiceImpl implements MovementService {
     public Flux<Movement> findByBankAccount(String idBankAccount) {
 
         return movementRepository.findAll()
-                .filter(movement -> movement.getIdBankAccount().equals(idBankAccount));
+                .filter(movement -> movement.getIdBankAccount() != null ? movement.getIdBankAccount().equals(idBankAccount) : movement.getIdBankCredit().equals(idBankAccount));
     }
 
     @Override

@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-
 
 @RestController
 public class MovementController {
@@ -22,6 +20,9 @@ public class MovementController {
 
     @Autowired
     private BankAccountService bankAccountService;
+
+//    @Autowired
+//    private BankCreditService bankCreditService;
 
     private final Logger logger = LoggerFactory.getLogger(MovementController.class);
 
@@ -69,8 +70,34 @@ public class MovementController {
                                                return bankAccountService.save(b);
                                            }).subscribe();
                                    break;
+                               case "T":
+                                   bankAccountService.findById(m.getIdBankAccount())
+                                           .flatMap(b -> {
+                                               Double currentAmount = b.getAmount();
+                                               Integer currentMovement = b.getMaxMovement();
+
+                                               if(currentAmount > movement.getAmount()) {
+                                                   currentAmount -= movement.getAmount();
+                                                   b.setAmount(currentAmount);
+
+                                                   if (currentMovement > 0) {
+                                                       currentMovement -= 1;
+                                                       b.setMaxMovement(currentMovement);
+                                                   }
+
+                                                   bankAccountService.findById(m.getIdBankAccountDestination())
+                                                           .flatMap(b1 -> {
+                                                               Double currentAmountDestination = b1.getAmount() + movement.getAmount();
+                                                               b1.setAmount(currentAmountDestination);
+                                                               return bankAccountService.save(b1);
+                                                           }).subscribe();
+                                               }
+
+                                               return bankAccountService.save(b);
+                                           });
                            }
                            break;
+
                    }
                    return Mono.empty();
                 });

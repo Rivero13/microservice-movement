@@ -21,5 +21,7 @@ public class Movement {
     private Date date;
     private double amount;
     private String idBankAccount;
+    private String idBankCredit;
+    private String idBankAccountDestination;
 
 }
