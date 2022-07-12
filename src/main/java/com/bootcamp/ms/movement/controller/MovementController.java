@@ -97,6 +97,30 @@ public class MovementController {
                                            });
                            }
                            break;
+                       case "Crédito":
+                           logger.info("primer switch");
+                           switch (m.getDescription()){
+                               case "C":
+                                   logger.info("segundo switch");
+                                   bankCreditService.findById(m.getIdBankCredit())
+                                           .flatMap(b -> {
+                                               logger.info(String.valueOf(b.getAmount()));
+                                               b.setAmount((b.getAmount() + movement.getAmount()));
+                                               logger.info(String.valueOf(b.getAmount()));
+                                               logger.info("en bank");
+                                               return bankCreditService.save(b);
+                                           }).subscribe();
+                                   break;
+                               case "P":
+                                   bankCreditService.findById(m.getIdBankCredit())
+                                           .flatMap(b -> {
+                                               b.setAmount((b.getAmount() - movement.getAmount()));
+
+                                               return bankCreditService.save(b);
+                                           }).subscribe();
+                                   break;
+                           }
+                           break;
 
                    }
                    return Mono.empty();
