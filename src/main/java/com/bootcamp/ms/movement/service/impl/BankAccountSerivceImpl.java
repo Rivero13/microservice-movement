@@ -1,7 +1,6 @@
 package com.bootcamp.ms.movement.service.impl;
 
 import com.bootcamp.ms.commons.entity.BankAccount;
-import com.bootcamp.ms.commons.entity.Client;
 import com.bootcamp.ms.movement.BankAccountConfig;
 import com.bootcamp.ms.movement.service.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;

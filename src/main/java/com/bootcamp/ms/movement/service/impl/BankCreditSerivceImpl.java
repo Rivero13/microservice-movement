@@ -1,10 +1,20 @@
 package com.bootcamp.ms.movement.service.impl;
 
+import com.bootcamp.ms.commons.entity.BankAccount;
 import com.bootcamp.ms.commons.entity.BankCredit;
+import com.bootcamp.ms.movement.CreditBankConfig;
+import com.bootcamp.ms.movement.service.BankCreditService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
-public class BankCreditSerivceImpl {
+public class BankCreditSerivceImpl implements BankCreditService {
 
     @Autowired
     private WebClient client;
@@ -24,7 +34,7 @@ public class BankCreditSerivceImpl {
     }
 
     @Override
-    public Mono<BankCredit> save(BankCredit bankAccount) {
+    public Mono<BankCredit> save2(BankCredit bankAccount) {
         return client.post()
                 .uri(bankAccountConfig.getUrl().concat("/create"))
                 .accept(MediaType.APPLICATION_JSON)

@@ -37,7 +37,7 @@ public class MovementServiceImpl implements MovementService {
     }
 
     @Override
-    public Mono<Void> deleteById(Movement movement) {
+    public Mono<Void> delete(Movement movement) {
         return movementRepository.delete(movement);
     }
 }

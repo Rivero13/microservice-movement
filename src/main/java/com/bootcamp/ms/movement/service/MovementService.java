@@ -14,6 +14,6 @@ public interface MovementService {
 
     public Mono<Movement> save(Movement movement);
 
-    public Mono<Void> deleteById(Movement movement);
+    public Mono<Void> delete(Movement movement);
 
 }
