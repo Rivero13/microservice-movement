@@ -20,10 +20,10 @@ public class MovementServiceImpl implements MovementService {
     }
 
     @Override
-    public Flux<Movement> findByBankAccount(String idBankAccount) {
+    public Flux<Movement> findByBankAccount(String id) {
 
         return movementRepository.findAll()
-                .filter(movement -> movement.getIdBankAccount() != null ? movement.getIdBankAccount().equals(idBankAccount) : movement.getIdBankCredit().equals(idBankAccount));
+                .filter(movement -> movement.getIdBankAccount() != null ? movement.getIdBankAccount().equals(id) : movement.getIdBankCredit().equals(id));
     }
 
     @Override
