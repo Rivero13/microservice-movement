@@ -8,7 +8,9 @@ public interface MovementService {
 
     public Flux<Movement> findAll();
 
-    public Flux<Movement> findByBankAccount(String bankAccount);
+    public Flux<Movement> findByBankAccount(String id);
+
+    public Flux<Movement> findLastTenByClient(String id);
 
     public Mono<Movement> findById(String id);
 

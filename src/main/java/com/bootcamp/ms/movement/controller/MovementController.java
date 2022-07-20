@@ -39,6 +39,11 @@ public class MovementController {
         return movementService.findByBankAccount(bankAccount);
     }
 
+    @GetMapping("/findLastTenByClient/{id}")
+    public Flux<Movement> findLastTenByClient(@PathVariable String id){
+        return movementService.findLastTenByClient(id);
+    }
+
     @GetMapping("/findBy/{id}")
     public Mono<Movement> findBy(@PathVariable String id){
         return movementService.findById(id);
@@ -49,86 +54,106 @@ public class MovementController {
 
         movement.setDate(new Date());
 
-        return movementService.save(movement)
-                .flatMap(m -> {
-                    switch (movement.getType()){
-                        case "Débito":
-                            logger.info("primer switch");
-                            switch (m.getDescription()){
-                                case "D":
-                                    logger.info("segundo switch");
-                                    bankAccountService.findById(m.getIdBankAccount())
-                                            .flatMap(b -> {
-                                                logger.info(String.valueOf(b.getAmount()));
-                                                b.setAmount((b.getAmount() + movement.getAmount()));
-                                                logger.info(String.valueOf(b.getAmount()));
-                                                logger.info("en bank");
-                                                return bankAccountService.save(b);
-                                            }).subscribe();
-                                    break;
-                                case "R":
-                                    bankAccountService.findById(m.getIdBankAccount())
-                                            .flatMap(b -> {
-                                                b.setAmount((b.getAmount() - movement.getAmount()));
-
-                                                return bankAccountService.save(b);
-                                            }).subscribe();
-                                    break;
-                                case "T":
-                                    bankAccountService.findById(m.getIdBankAccount())
-                                            .flatMap(b -> {
-                                                Double currentAmount = b.getAmount();
-                                                Integer currentMovement = b.getMaxMovement();
-
-                                                if(currentAmount > movement.getAmount()) {
-                                                    currentAmount -= movement.getAmount();
-                                                    b.setAmount(currentAmount);
-
-                                                    if (currentMovement > 0) {
-                                                        currentMovement -= 1;
-                                                        b.setMaxMovement(currentMovement);
-                                                    }
-
-                                                    bankAccountService.findById(m.getIdBankAccountDestination())
-                                                            .flatMap(b1 -> {
-                                                                Double currentAmountDestination = b1.getAmount() + movement.getAmount();
-                                                                b1.setAmount(currentAmountDestination);
-                                                                return bankAccountService.save(b1);
+        if(movement.getIdBankAccount()!=null){
+            return bankAccountService.findById(movement.getIdBankAccount())
+                    .flatMap(p -> {
+                        logger.info("get client {}",p.getIdClient());
+                        movement.setIdClient(p.getIdClient());
+                        return movementService.save(movement)
+                                .flatMap(m -> {
+                                    if (movement.getType().equalsIgnoreCase("Débito")){
+                                            logger.info("primer switch");
+                                            switch (m.getDescription()){
+                                                case "D":
+                                                    logger.info("segundo switch");
+                                                    bankAccountService.findById(m.getIdBankAccount())
+                                                            .flatMap(b -> {
+                                                                logger.info(String.valueOf(b.getAmount()));
+                                                                b.setAmount((b.getAmount() + movement.getAmount()));
+                                                                logger.info(String.valueOf(b.getAmount()));
+                                                                logger.info("en bank");
+                                                                return bankAccountService.save(b);
                                                             }).subscribe();
-                                                }
+                                                    break;
+                                                case "R":
+                                                    bankAccountService.findById(m.getIdBankAccount())
+                                                            .flatMap(b -> {
+                                                                b.setAmount((b.getAmount() - movement.getAmount()));
 
-                                                return bankAccountService.save(b);
-                                            }).subscribe();
-                            }
-                            break;
-                        case "Crédito":
-                            logger.info("primer switch");
-                            switch (m.getDescription()){
-                                case "C":
-                                    logger.info("segundo switch");
-                                    bankCreditService.findById(m.getIdBankCredit())
-                                            .flatMap(b -> {
-                                                logger.info(String.valueOf(b.getAmount()));
-                                                b.setAmount((b.getAmount() + movement.getAmount()));
-                                                logger.info(String.valueOf(b.getAmount()));
-                                                logger.info("en bank");
-                                                return bankCreditService.save2(b);
-                                            }).subscribe();
-                                    break;
-                                case "P":
-                                    bankCreditService.findById(m.getIdBankCredit())
-                                            .flatMap(b -> {
-                                                b.setAmount((b.getAmount() - movement.getAmount()));
+                                                                return bankAccountService.save(b);
+                                                            }).subscribe();
+                                                    break;
+                                                case "T":
+                                                    bankAccountService.findById(m.getIdBankAccount())
+                                                            .flatMap(b -> {
+                                                                Double currentAmount = b.getAmount();
+                                                                Integer currentMovement = b.getMaxMovement();
 
-                                                return bankCreditService.save2(b);
-                                            }).subscribe();
-                                    break;
-                            }
-                            break;
+                                                                if(currentAmount > movement.getAmount()) {
+                                                                    currentAmount -= movement.getAmount();
+                                                                    b.setAmount(currentAmount);
 
-                    }
-                    return Mono.just(movement);
-                });
+                                                                    if (currentMovement > 0) {
+                                                                        currentMovement -= 1;
+                                                                        b.setMaxMovement(currentMovement);
+                                                                    }
+
+                                                                    bankAccountService.findById(m.getIdBankAccountDestination())
+                                                                            .flatMap(b1 -> {
+                                                                                Double currentAmountDestination = b1.getAmount() + movement.getAmount();
+                                                                                b1.setAmount(currentAmountDestination);
+                                                                                return bankAccountService.save(b1);
+                                                                            }).subscribe();
+                                                                }
+
+                                                                return bankAccountService.save(b);
+                                                            }).subscribe();
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                    }
+                                    return Mono.just(movement);
+                                });
+                    });
+        }else{
+            return bankCreditService.findById(movement.getIdBankCredit())
+                    .flatMap(p -> {
+                        logger.info("get client {}",p.getIdClient());
+                        movement.setIdClient(p.getIdClient());
+                        return movementService.save(movement)
+                                .flatMap(m -> {
+                                    if (movement.getType().equalsIgnoreCase("Crédito")){
+                                            logger.info("primer switch");
+                                            switch (m.getDescription()){
+                                                case "C":
+                                                    logger.info("segundo switch");
+                                                    bankCreditService.findById(m.getIdBankCredit())
+                                                            .flatMap(b -> {
+                                                                logger.info(String.valueOf(b.getAmount()));
+                                                                b.setAmount((b.getAmount() + movement.getAmount()));
+                                                                logger.info(String.valueOf(b.getAmount()));
+                                                                logger.info("en bank");
+                                                                return bankCreditService.save2(b);
+                                                            }).subscribe();
+                                                    break;
+                                                case "P":
+                                                    bankCreditService.findById(m.getIdBankCredit())
+                                                            .flatMap(b -> {
+                                                                b.setAmount((b.getAmount() - movement.getAmount()));
+
+                                                                return bankCreditService.save2(b);
+                                                            }).subscribe();
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                    }
+                                    return Mono.just(movement);
+                                });
+                    });
+        }
+
     }
 
     @DeleteMapping("/{id}")

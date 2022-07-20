@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
+
 @Service
 public class MovementServiceImpl implements MovementService {
 
@@ -24,6 +26,14 @@ public class MovementServiceImpl implements MovementService {
 
         return movementRepository.findAll()
                 .filter(movement -> movement.getIdBankAccount() != null ? movement.getIdBankAccount().equals(id) : movement.getIdBankCredit().equals(id));
+    }
+
+    @Override
+    public Flux<Movement> findLastTenByClient(String id) {
+        Flux<Movement>  movementFlux = movementRepository.findAll()
+                .sort(Comparator.comparing(Movement::getDate, Comparator.reverseOrder()))
+                .filter(movement -> movement.getIdClient().equals(id));
+        return movementFlux.take(10);
     }
 
     @Override

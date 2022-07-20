@@ -23,5 +23,7 @@ public class Movement {
     private String idBankAccount;
     private String idBankCredit;
     private String idBankAccountDestination;
+    private String idBankCreditDestination;
+    private String idClient;
 
 }

@@ -3,6 +3,7 @@ spring:
     name: microservice-movement
   cloud:
     config:
-      uri: http://servicio-config-server:8888
+      #uri: http://servicio-config-server:8888
+      uri: http://localhost:8888
       username: jair
       password: jair123
