@@ -9,12 +9,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 @Service
 public class MovementServiceImpl implements MovementService {
 
     @Autowired
     private MovementRepository movementRepository;
+
+    public MovementServiceImpl(MovementRepository movementRepository) {
+        this.movementRepository = movementRepository;
+    }
 
     @Override
     public Flux<Movement> findAll() {
@@ -49,5 +54,13 @@ public class MovementServiceImpl implements MovementService {
     @Override
     public Mono<Void> delete(Movement movement) {
         return movementRepository.delete(movement);
+    }
+
+    @Override
+    public Optional<Movement> findByIdOpt(String id) {
+        return movementRepository.findAll()
+                .toStream()
+                .filter(b -> b.getId().contains(id))
+                .findFirst();
     }
 }
