@@ -8,6 +8,7 @@ import com.bootcamp.ms.movement.service.MovementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,6 +51,7 @@ public class MovementController {
     }
 
     @PostMapping(value = "/create")
+    @ResponseStatus(HttpStatus.CREATED)
     public Mono<Movement> create(@RequestBody Movement movement){
 
         movement.setDate(new Date());
